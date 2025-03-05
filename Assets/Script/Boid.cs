@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 public class Boid : MonoBehaviour
@@ -8,6 +9,13 @@ public class Boid : MonoBehaviour
     public float speed = 5f;
     public float neighborRadius = 3f;
     public float separationDistance = 1.5f;
+
+    [Header("Random Speed")] 
+    public bool needRandom;
+    public float minSpeed;
+    public float maxSpeed;
+    public float randomTime;
+    private float currentRandom;
 
     private Vector3 velocity;
     private List<Boid> neighbors;
@@ -32,7 +40,15 @@ public class Boid : MonoBehaviour
         velocity = velocity.normalized * speed;
 
         transform.position += velocity * Time.deltaTime;
-        transform.position = velocity.normalized;
+        transform.forward = velocity.normalized;
+
+        if (!needRandom) return;
+        currentRandom += Time.deltaTime;
+        if (currentRandom >= randomTime)
+        {
+            speed = Random.Range(minSpeed, maxSpeed);
+            currentRandom = 0;
+        }
     }
 
     private List<Boid> GetNeighbors()
@@ -85,4 +101,6 @@ public class Boid : MonoBehaviour
         centerOfMass /= neighbors.Count;
         return (centerOfMass - transform.position) * CoeffCohesion;
     }
+    
+    
 }
